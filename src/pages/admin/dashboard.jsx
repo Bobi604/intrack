@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { HeaderA } from "../../layouts/admin/header";
 import { SidebarA } from "../../layouts/admin/sidebar";
-import { Footer } from "../../components/Footer";
+import { Footer } from "../../components/footer";
 import { Table, Tbdy, Td, Thead, Tr } from "../../components/Table";
 import { FaUsers } from "react-icons/fa";
 import { ImLocation2 } from "react-icons/im";
