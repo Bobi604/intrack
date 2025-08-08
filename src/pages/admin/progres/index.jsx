@@ -13,7 +13,7 @@ export const ProgressPage = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          "http://192.168.0.238:8000/api/job_interns",{headers: { Authorization: `Bearer ${Cookies.get("token")}` }}
+          "https://192.168.0.238:8000/api/job_interns",{headers: { Authorization: `Bearer ${Cookies.get("token")}` }}
         );
         console.log("Data fetched successfully:", res.data);
         setProgress(res.data.data);

@@ -13,7 +13,7 @@ export const UsersForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const url = "http://192.168.0.238:8000/api/users";
+    const url = "https://192.168.0.238:8000/api/users";
 
     const formData = new FormData();
 

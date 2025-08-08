@@ -12,7 +12,7 @@ export const UsersPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("http://192.168.0.238:8000/api/users", {
+        const res = await axios.get("https://192.168.0.238:8000/api/users", {
           headers: { Authorization: `Bearer ${Cookies.get("token")}` },
         });
         console.log("Data fetched successfully:", res.data);

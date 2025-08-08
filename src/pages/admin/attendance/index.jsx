@@ -14,7 +14,7 @@ export const AttendancePage = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          "http://192.168.0.238:8000/api/intern_attends",
+          "https://192.168.0.238:8000/api/intern_attends",
           { headers: { Authorization: `Bearer ${Cookies.get("token")}` } }
         );
         console.log("Data fetched successfully:", res.data);

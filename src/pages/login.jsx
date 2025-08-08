@@ -15,7 +15,7 @@ export const LoginPage = () => {
 
     try {
       const res = await axios.post(
-        "http://192.168.0.238:8000/api/login",
+        "https://192.168.0.238:8000/api/login",
         form
       );
 
