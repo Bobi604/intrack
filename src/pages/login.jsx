@@ -1,8 +1,45 @@
-import React from "react";
-import { Link } from "react-router";
-import Logo from "../../src/assets/img/logo.png"; // Adjust the path to your logo image
+import React, { useState } from "react";
+import { useNavigate } from "react-router";
+import axios from "axios";
+import Cookies from "js-cookie";
+import Logo from "../../src/assets/img/logo.png";
 
-export default function LoginPage() {
+export const LoginPage = () => {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(""); // Reset error
+
+    try {
+      const res = await axios.post(
+        "http://192.168.0.238:8000/api/login",
+        form
+      );
+
+      const token = res.data.token.plainTextToken;
+      const role = res.data.token.accessToken.abilities; // Ambil "admin", "staff", "magang"
+      const user = res.data?.user;
+
+      // Simpan ke cookies
+      Cookies.set("token", token, { expires: 7 });
+      Cookies.set("role", role || "");
+      Cookies.set("username", user?.name || "");
+      Cookies.set("userId", user?.id || "");
+
+      // Arahkan berdasarkan role
+      if (role === "admin") navigate("/dashboardadmin");
+      else if (role === "staff") navigate("/dashboardstaff");
+      else if (role === "attendance") navigate("/dashboardmagang");
+      else navigate("/dashboardadmin");
+    } catch (err) {
+      console.error(err);
+      setError("Email atau password salah.");
+    }
+  };
+
   return (
     <div className="min-h-screen flex">
       {/* Left Side */}
@@ -15,43 +52,49 @@ export default function LoginPage() {
             Enter your email and password to sign in
           </p>
 
-          <form className="space-y-4">
+          {error && <p className="text-red-500 mb-2">{error}</p>}
+
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <input
                 type="email"
+                name="email"
                 placeholder="Your email address"
+                value={form.email}
+                onChange={(e) =>
+                  setForm({ ...form, [e.target.name]: e.target.value })
+                }
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
+                required
               />
             </div>
             <div>
               <input
                 type="password"
+                name="password"
                 placeholder="Your password"
+                value={form.password}
+                onChange={(e) =>
+                  setForm({ ...form, [e.target.name]: e.target.value })
+                }
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
+                required
               />
             </div>
 
-            <div className="flex items-center text-sm">
-              <input type="checkbox" id="remember" className="mr-2" />
-              <label htmlFor="remember" className="text-gray-600">
-                Remember me
-              </label>
-            </div>
-            <Link>
-              <button
-                type="submit"
-                className="w-full bg-teal-400 text-white font-semibold py-2 rounded-md hover:bg-teal-500 transition"
-              >
-                SIGN IN
-              </button>
-            </Link>
+            <button
+              type="submit"
+              className="w-full bg-teal-400 text-white font-semibold py-2 rounded-md hover:bg-teal-500 transition"
+            >
+              SIGN IN
+            </button>
           </form>
 
           <p className="text-sm text-gray-500 text-center mt-4">
-            Don’t have an account?{" "}
-            <a href="/register" className="text-teal-400 font-semibold">
+            Don't have an account?{" "}
+            <span className="text-teal-400 font-semibold cursor-pointer">
               Sign up
-            </a>
+            </span>
           </p>
         </div>
       </div>
@@ -65,4 +108,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-}
+};

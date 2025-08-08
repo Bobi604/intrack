@@ -1,12 +1,53 @@
-import React from "react";
-import { Link } from "react-router";
+import axios from "axios";
+import { swalMixin } from "../../../library/sweetalert";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router";
 
 export const AttendanceForm = () => {
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({});
+  const [validationError, setValidationError] = useState([]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const url =
+      "https://intern-manage-2025-production.up.railway.app/api/intern_attends";
+
+    const formData = new FormData();
+
+    form.name && formData.append("name", form.name);
+    form.tanggal && formData.append("tanggal", form.tanggal);
+    form.jam_masuk && formData.append("jam_masuk", form.jam_masuk);
+    form.jam_keluar && formData.append("jam_keluar", form.jam_keluar);
+    form.status && formData.append("status", form.status);
+
+    try {
+      const res = await axios.post(url, formData);
+      console.log(res.data);
+
+      if (res.data) {
+        swalMixin("success", `${res.data.message}`);
+        navigate("/attendance");
+      }
+    } catch (error) {
+      console.error(error);
+
+      if (error.status === 422) {
+        setValidationError(error.response.data.errors);
+      }
+    }
+  };
+
+  useEffect(() => {
+    console.log(form);
+  }, [form]);
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h2 className="font-semibold text-lg mb-6">Add New Attendance</h2>
 
-      <form className="space-y-4">
+      <form className="space-y-4" onSubmit={handleSubmit}>
         {/* Name */}
         <div>
           <label className="block text-sm font-medium text-gray-700">
@@ -14,9 +55,23 @@ export const AttendanceForm = () => {
           </label>
           <input
             type="text"
+            name="name"
             placeholder="Write here . . . ."
             className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onKeyUp={(e) => {
+              setForm((prev) => {
+                return { ...prev, [e.target.name]: e.target.value };
+              });
+            }}
           />
+          {validationError.name && (
+            <span
+              className="text-red-500 block mb-3
+          "
+            >
+              {validationError.name}
+            </span>
+          )}
         </div>
 
         {/* Date */}
@@ -26,8 +81,22 @@ export const AttendanceForm = () => {
           </label>
           <input
             type="date"
+            name="tanggal"
             className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onKeyUp={(e) => {
+              setForm((prev) => {
+                return { ...prev, [e.target.name]: e.target.value };
+              });
+            }}
           />
+          {validationError.tanggal && (
+            <span
+              className="text-red-500 block mb-3
+          "
+            >
+              {validationError.tanggal}
+            </span>
+          )}
         </div>
 
         {/* Check In */}
@@ -37,8 +106,22 @@ export const AttendanceForm = () => {
           </label>
           <input
             type="time"
+            name="jam_masuk"
             className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onKeyUp={(e) => {
+              setForm((prev) => {
+                return { ...prev, [e.target.name]: e.target.value };
+              });
+            }}
           />
+          {validationError.jam_masuk && (
+            <span
+              className="text-red-500 block mb-3
+          "
+            >
+              {validationError.jam_masuk}
+            </span>
+          )}
         </div>
 
         {/* Check Out */}
@@ -48,8 +131,22 @@ export const AttendanceForm = () => {
           </label>
           <input
             type="time"
+            name="jam_keluar"
             className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onKeyUp={(e) => {
+              setForm((prev) => {
+                return { ...prev, [e.target.name]: e.target.value };
+              });
+            }}
           />
+          {validationError.jam_keluar && (
+            <span
+              className="text-red-500 block mb-3
+          "
+            >
+              {validationError.jam_keluar}
+            </span>
+          )}
         </div>
 
         {/* Keterangan */}
@@ -57,11 +154,26 @@ export const AttendanceForm = () => {
           <label className="block text-sm font-medium text-gray-700">
             Keterangan
           </label>
-          <textarea
+          <input
+            type="select"
+            name="status"
             placeholder="Write here . . . ."
             className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows="3"
+            onKeyUp={(e) => {
+              setForm((prev) => {
+                return { ...prev, [e.target.name]: e.target.value };
+              });
+            }}
           />
+          {validationError.status && (
+            <span
+              className="text-red-500 block mb-3
+          "
+            >
+              {validationError.status}
+            </span>
+          )}
         </div>
 
         {/* Buttons */}
@@ -83,5 +195,3 @@ export const AttendanceForm = () => {
     </div>
   );
 };
-
-

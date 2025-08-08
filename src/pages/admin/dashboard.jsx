@@ -1,6 +1,6 @@
-import { useEffect } from "react";
-import { HeaderA } from "../../layouts/admin/header";
-import { SidebarA } from "../../layouts/admin/sidebar";
+import { useEffect, useState } from "react";
+import { HeaderA } from "../../layouts/header";
+import { Sidebar } from "../../layouts/sidebar";
 import { Footer } from "../../components/footer";
 import { Table, Tbdy, Td, Thead, Tr } from "../../components/table";
 import { FaUsers } from "react-icons/fa";
@@ -9,16 +9,33 @@ import { IoMdMegaphone } from "react-icons/io";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { IoDocumentText } from "react-icons/io5";
 import { Link } from "react-router";
+import axios from "axios";
+import Cookies from "js-cookie";
 
 export const DashboardAdminPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  const [attendances, setAttendance] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(
+          "http://192.168.0.238:8000/api/intern_attends",{headers:{Authorization: `Bearer ${Cookies.get("token")}`}}
+        );
+        console.log("Data fetched successfully:", res.data);
+        setAttendance(res.data.data);
+      } catch (error) {
+        console.error("Error in Sidebar component:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <div className="bg-gray-200 text-gray-900">
       <HeaderA />
-      <SidebarA />
+      <Sidebar />
 
       <main className="md:ml-64 p-6 pt-20 transition-all min-h-screen">
         <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
@@ -81,7 +98,7 @@ export const DashboardAdminPage = () => {
               <h4>Design UI/UX</h4>
               <p className="text-sm">Lorem ipsum dolor sit amet.</p>
               <h4>Database Sistem</h4>
-              <pc className="text-sm">Lorem ipsum dolor sit amet.</pc>
+              <p className="text-sm">Lorem ipsum dolor sit amet.</p>
               <h4>Frontend</h4>
               <p className="text-sm">Lorem ipsum dolor sit amet.</p>
             </ul>
@@ -102,16 +119,18 @@ export const DashboardAdminPage = () => {
               </Tr>
             </Thead>
             <Tbdy>
-              <Tr>
-                <Td>John Cena</Td>
-                <Td>01 Jan 2023</Td>
-                <Td>09:00 AM</Td>
-                <Td>
-                  <span className="px-2 py-1 rounded bg-green-100 text-green-600 text-xs">
-                    Present
-                  </span>
-                </Td>
-              </Tr>
+              {attendances.map((attendance) => (
+                <Tr key={attendance.id}>
+                  <Td>{attendance.user.name}</Td>
+                  <Td>{attendance.tanggal}</Td>
+                  <Td>{attendance.jam_masuk}</Td>
+                  <Td>
+                    <span className="px-2 py-1 rounded bg-green-100 text-green-600 text-xs">
+                      {attendance.status}
+                    </span>
+                  </Td>
+                </Tr>
+              ))}
             </Tbdy>
           </Table>
         </div>
