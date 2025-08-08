@@ -16,13 +16,12 @@ import { UsersForm } from "../pages/admin/users/create";
 import { Home } from "../pages/home";
 import { ProfilePage } from "../pages/profile";
 
-
 export const RootRoute = () => {
   return (
     <BrowserRouter>
       <Routes>
         {/* Root route */}
-        <Route path="/" element={<Home />} />
+        <Route index element={<Home />} />
 
         {/* Authentication routes */}
         <Route path="/login" element={<LoginPage />} />
@@ -39,7 +38,7 @@ export const RootRoute = () => {
         {/* Magang routes */}
         <Route path="/attendance" element={<AttendancePage />} />
         <Route path="/ceratea" element={<AttendanceForm />} />
-        <Route path="/edita" element={<EditAttendance/>} />
+        <Route path="/edita" element={<EditAttendance />} />
         <Route path="/jadwal" element={<JadwalPage />} />
         <Route path="/progress" element={<ProgressPage />} />
         <Route path="/createP" element={<ProgressForm />} />
