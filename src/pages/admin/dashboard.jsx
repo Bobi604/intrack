@@ -21,7 +21,8 @@ export const DashboardAdminPage = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          "https://192.168.0.238:8000/api/intern_attends",{headers:{Authorization: `Bearer ${Cookies.get("token")}`}}
+          "https://intern-manage-2025-production.up.railway.app/api/intern_attends",
+          { headers: { Authorization: `Bearer ${Cookies.get("token")}` } }
         );
         console.log("Data fetched successfully:", res.data);
         setAttendance(res.data.data);

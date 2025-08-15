@@ -12,15 +12,18 @@ export const UsersPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("https://192.168.0.238:8000/api/users", {
-          headers: { Authorization: `Bearer ${Cookies.get("token")}` },
-        });
-        console.log("Data fetched successfully:", res.data);
+        const res = await axios.get(
+          "https://intern-manage-2025-production.up.railway.app/api/users",
+          {
+            headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+          }
+        );
         setUsers(res.data.data);
-      } catch (error) {
-        console.error("Error in Sidebar component:", error);
+      } catch (err) {
+        console.error(err);
       }
     };
+
     fetchData();
   }, []);
   return (
@@ -58,11 +61,11 @@ export const UsersPage = () => {
                   <Td>{user.role}</Td>
                   <Td>
                     <img
-                      src={`http://192.168.0.238:8000/d-custs/img/avt/${user.photo}`}
+                      src={`http://intern-manage-2025-production.up.railway.app/d-custs/img/avt/${user.photo}`}
                       alt=""
                     />
                   </Td>
-                  <Td className="xl:text-wrap">{user.date   }</Td>
+                  <Td className="xl:text-wrap">{user.date}</Td>
                   <Td>
                     <button className="text-blue-500 hover:underline">
                       Edit

@@ -15,16 +15,14 @@ export const Sidebar = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await axios.get("http://192.168.0.238:8000/api/users", {
-          headers: { Authorization: `Bearer ${Cookies.get("token")}` },
-        });
-        const role = Cookies.get("role ");
-        if (role) {
-          Cookies.set("role", role);
-        }
+        await axios.get(
+          "https://intern-manage-2025-production.up.railway.app/api/users",
+          {
+            headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+          }
+        );
       } catch (error) {
         console.error("Error fetching roles:", error);
-        Cookies.set("role", "guest"); // fallback agar sidebar tetap muncul
       }
     };
 
@@ -44,9 +42,9 @@ export const Sidebar = () => {
     ],
     staff: [
       { to: "/dashboardstaff", label: "Dashboard", icon: <FaHome /> },
-      { to: "/magang", label: "Magang", icon: <BsClipboardData /> },
-      { to: "/attendance", label: "Attendance", icon: <ImLocation2 /> },
-      { to: "/progress", label: "Daily Work Report", icon: <IoMdMegaphone /> },
+      { to: "/magangs", label: "Internship", icon: <BsClipboardData /> },
+      { to: "/attendances", label: "Attendance", icon: <ImLocation2 /> },
+      { to: "/progresss", label: "Daily Work Report", icon: <IoMdMegaphone /> },
     ],
     intern: [
       { to: "/dashboardmagang", label: "Dashboard", icon: <FaHome /> },

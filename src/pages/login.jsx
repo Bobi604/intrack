@@ -5,6 +5,8 @@ import Cookies from "js-cookie";
 import Logo from "../../src/assets/img/logo.png";
 
 export const LoginPage = () => {
+  axios.defaults.withCredentials = true; // Set axios to send cookies with requests'
+  axios.defaults.withXSRFToken = true; // Enable CSRF protection
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -14,8 +16,11 @@ export const LoginPage = () => {
     setError(""); // Reset error
 
     try {
+      await axios.get(
+        "https://intern-manage-2025-production.up.railway.app/sanctum/csrf-cookie"
+      ); // Get CSRF token
       const res = await axios.post(
-        "https://192.168.0.238:8000/api/login",
+        "https://intern-manage-2025-production.up.railway.app/api/login",
         form
       );
 

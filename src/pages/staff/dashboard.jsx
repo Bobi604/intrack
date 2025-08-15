@@ -20,7 +20,7 @@ export const DashboardStaffPage = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          "https://intern-manage-2025-production.up.railway.app/api/intern_attends"
+          "https://intern-manage-2025-production.up.railway.app/api/intern_attend"
         );
         console.log("Data fetched successfully:", res.data);
         setAttendance(res.data.data);
