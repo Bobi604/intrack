@@ -6,26 +6,52 @@ import { Link } from "react-router";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { swalDialog, swalMixin } from "../../../library/sweetalert";
 
 export const UsersPage = () => {
   const [users, setUsers] = useState([]);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(
-          "https://intern-manage-2025-production.up.railway.app/api/users",
-          {
-            headers: { Authorization: `Bearer ${Cookies.get("token")}` },
-          }
-        );
-        setUsers(res.data.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
 
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(
+        "https://intern-manage-2025-production.up.railway.app/api/users",
+        {
+          headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+        }
+      );
+      setUsers(res.data.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, []);
+
+  // ✅ Fungsi delete user
+const handleDeleteUser = async (id) => {
+  const confirm = await swalDialog("Are you sure you want to delete this user?", "warning");
+
+  if (!confirm.isConfirmed) return;
+
+  try {
+    const response = await axios.delete(
+      `https://intern-manage-2025-production.up.railway.app/api/users/${id}`,
+      {
+        headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+      }
+    );
+
+    swalMixin("success", response.data.message); // pakai Toast untuk feedback
+    fetchData(); // pastikan ini adalah fungsi untuk refresh data user
+  } catch (error) {
+    console.error(error);
+    swalMixin("error", "Failed to delete user.");
+  }
+};
+
+
   return (
     <div className="bg-gray-200 text-gray-900">
       <HeaderA />
@@ -62,15 +88,22 @@ export const UsersPage = () => {
                   <Td>
                     <img
                       src={`http://intern-manage-2025-production.up.railway.app/d-custs/img/avt/${user.photo}`}
-                      alt=""
+                      alt="user-avatar"
+                      className="w-12 h-12 rounded-full object-cover"
                     />
                   </Td>
                   <Td className="xl:text-wrap">{user.date}</Td>
                   <Td>
-                    <button className="text-blue-500 hover:underline">
+                    <Link
+                      to={`/editU/${user.id}`}
+                      className="text-blue-500 hover:underline"
+                    >
                       Edit
-                    </button>
-                    <button className="text-red-500 hover:underline ml-2">
+                    </Link>
+                    <button
+                      onClick={() => handleDeleteUser(user.id)}
+                      className="text-red-500 hover:underline ml-2"
+                    >
                       Delete
                     </button>
                   </Td>

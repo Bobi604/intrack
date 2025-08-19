@@ -31,14 +31,14 @@ export const AttendancePage = () => {
       <Sidebar />
       <main className="md:ml-64 p-3 pt-20 transition-all min-h-screen bg-gray-200 rounded-lg">
         <div className="bg-white p-4 shadow rounded-xl overflow-auto">
-          <h3 className="text-xl font-semibold mb-4">ATTANDANCE</h3>
+          <h3 className="text-xl font-semibold mb-4">ATTENDANCE</h3>
           <p>Manage Attandance</p>
           <div className="flex justify-end mb-4">
             <Link
               to="/ceratea"
               className="bg-gradient-to-br from-blue-900 to-gray-800 text-white px-4 py-2 rounded-xl hover:bg-teal-600"
             >
-              ADD A NEW INTERN
+              ADD A NEW ATTENDANCE
             </Link>
           </div>
           <Table>

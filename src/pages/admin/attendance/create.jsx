@@ -1,197 +1,187 @@
 import axios from "axios";
+import { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router";
+import Cookies from "js-cookie";
 import { swalMixin } from "../../../library/sweetalert";
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router";
 
 export const AttendanceForm = () => {
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({});
-  const [validationError, setValidationError] = useState([]);
+  const [form, setForm] = useState({
+    user_id: "",
+    tanggal: "",
+    jam_masuk: "",
+    jam_keluar: "",
+    status: "",
+  });
+
+  const [users, setUsers] = useState([]);
+  const [validationError, setValidationError] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  // Fetch user list on mount
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const token = Cookies.get("token");
+        const res = await axios.get(
+          "https://intern-manage-2025-production.up.railway.app/api/users",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setUsers(res.data.data);
+      } catch (err) {
+        console.error("User fetch failed:", err);
+        if (err.response?.status === 401) {
+          swalMixin("error", "Unauthorized. Please login again.");
+        }
+      }
+    };
+    fetchUsers();
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const url =
-      "https://intern-manage-2025-production.up.railway.app/api/intern_attends";
-
-    const formData = new FormData();
-
-    form.name && formData.append("name", form.name);
-    form.tanggal && formData.append("tanggal", form.tanggal);
-    form.jam_masuk && formData.append("jam_masuk", form.jam_masuk);
-    form.jam_keluar && formData.append("jam_keluar", form.jam_keluar);
-    form.status && formData.append("status", form.status);
-
+    setLoading(true);
+    setValidationError({});
     try {
-      const res = await axios.post(url, formData);
-      console.log(res.data);
-
-      if (res.data) {
-        swalMixin("success", `${res.data.message}`);
-        navigate("/attendance");
+      const token = Cookies.get("token");
+      const res = await axios.post(
+        "https://intern-manage-2025-production.up.railway.app/api/intern_attends",
+        form,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      swalMixin("success", res.data.message || "Attendance recorded!");
+      navigate("/attendance");
+    } catch (err) {
+      console.error("Submit error:", err);
+      if (err.response?.status === 422) {
+        setValidationError(err.response.data.errors);
+      } else if (err.response?.status === 401) {
+        swalMixin("error", "Unauthorized. Please login.");
+      } else {
+        swalMixin("error", "Something went wrong.");
       }
-    } catch (error) {
-      console.error(error);
-
-      if (error.status === 422) {
-        setValidationError(error.response.data.errors);
-      }
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    console.log(form);
-  }, [form]);
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h2 className="font-semibold text-lg mb-6">Add New Attendance</h2>
-
+    <div className="max-w-3xl mx-auto p-6">
+      <h2 className="text-2xl font-semibold mb-6">Create Attendance</h2>
       <form className="space-y-4" onSubmit={handleSubmit}>
-        {/* Name */}
+        {/* User Dropdown */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Name
-          </label>
-          <input
-            type="text"
-            name="name"
-            placeholder="Write here . . . ."
-            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onKeyUp={(e) => {
-              setForm((prev) => {
-                return { ...prev, [e.target.name]: e.target.value };
-              });
-            }}
-          />
-          {validationError.name && (
-            <span
-              className="text-red-500 block mb-3
-          "
-            >
-              {validationError.name}
-            </span>
+          <label className="block font-medium">User</label>
+          <select
+            name="user_id"
+            value={form.user_id}
+            onChange={handleChange}
+            className="w-full border px-4 py-2 rounded"
+          >
+            <option value="">-- Select user --</option>
+            {users.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.name} ({user.email})
+              </option>
+            ))}
+          </select>
+          {validationError.user_id && (
+            <p className="text-red-500 text-sm">{validationError.user_id}</p>
           )}
         </div>
 
         {/* Date */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Date
-          </label>
-          <input
-            type="date"
-            name="tanggal"
-            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onKeyUp={(e) => {
-              setForm((prev) => {
-                return { ...prev, [e.target.name]: e.target.value };
-              });
-            }}
-          />
-          {validationError.tanggal && (
-            <span
-              className="text-red-500 block mb-3
-          "
-            >
-              {validationError.tanggal}
-            </span>
-          )}
-        </div>
+        <InputField
+          label="Tanggal"
+          name="tanggal"
+          type="date"
+          value={form.tanggal}
+          onChange={handleChange}
+          error={validationError.tanggal}
+        />
 
         {/* Check In */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Check In
-          </label>
-          <input
-            type="time"
-            name="jam_masuk"
-            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onKeyUp={(e) => {
-              setForm((prev) => {
-                return { ...prev, [e.target.name]: e.target.value };
-              });
-            }}
-          />
-          {validationError.jam_masuk && (
-            <span
-              className="text-red-500 block mb-3
-          "
-            >
-              {validationError.jam_masuk}
-            </span>
-          )}
-        </div>
+        <InputField
+          label="Check In"
+          name="jam_masuk"
+          type="time"
+          value={form.jam_masuk}
+          onChange={handleChange}
+          error={validationError.jam_masuk}
+        />
 
         {/* Check Out */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Check Out
-          </label>
-          <input
-            type="time"
-            name="jam_keluar"
-            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onKeyUp={(e) => {
-              setForm((prev) => {
-                return { ...prev, [e.target.name]: e.target.value };
-              });
-            }}
-          />
-          {validationError.jam_keluar && (
-            <span
-              className="text-red-500 block mb-3
-          "
-            >
-              {validationError.jam_keluar}
-            </span>
-          )}
-        </div>
+        <InputField
+          label="Check Out"
+          name="jam_keluar"
+          type="time"
+          value={form.jam_keluar}
+          onChange={handleChange}
+          error={validationError.jam_keluar}
+        />
 
-        {/* Keterangan */}
+        {/* Status */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Keterangan
-          </label>
-          <input
-            type="select"
+          <label className="block font-medium">Status</label>
+          <textarea
             name="status"
-            placeholder="Write here . . . ."
-            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={form.status}
+            onChange={handleChange}
             rows="3"
-            onKeyUp={(e) => {
-              setForm((prev) => {
-                return { ...prev, [e.target.name]: e.target.value };
-              });
-            }}
+            className="w-full px-4 py-2 border rounded"
+            placeholder="Keterangan"
           />
           {validationError.status && (
-            <span
-              className="text-red-500 block mb-3
-          "
-            >
-              {validationError.status}
-            </span>
+            <p className="text-red-500 text-sm">{validationError.status}</p>
           )}
         </div>
 
-        {/* Buttons */}
+        {/* Actions */}
         <div className="flex gap-4 pt-4">
           <button
             type="submit"
-            className="bg-gradient-to-br from-blue-900 to-gray-800 text-white px-6 py-2 rounded-lg hover:bg-[#1e2240] transition"
+            disabled={loading}
+            className={`bg-blue-700 text-white px-6 py-2 rounded hover:bg-blue-800 ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            ADD NEW
+            {loading ? "Processing..." : "Submit"}
           </button>
           <Link
             to="/attendance"
-            className="bg-gray-400 text-white px-6 py-2 rounded-lg hover:bg-gray-500 transition"
+            className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600"
           >
-            CANCLE
+            Cancel
           </Link>
         </div>
       </form>
     </div>
   );
 };
+
+// Reusable Input
+const InputField = ({ label, name, type, value, onChange, error }) => (
+  <div>
+    <label className="block font-medium">{label}</label>
+    <input
+      type={type}
+      name={name}
+      value={value}
+      onChange={onChange}
+      className="w-full border px-4 py-2 rounded"
+    />
+    {error && <p className="text-red-500 text-sm">{error}</p>}
+  </div>
+);

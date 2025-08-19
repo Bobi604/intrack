@@ -5,6 +5,7 @@ import { Link } from "react-router";
 import Logo from "../../src/assets/img/logo.png";
 
 export const RegisterPage = () => {
+  
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
@@ -31,19 +32,9 @@ export const RegisterPage = () => {
       <div className="flex-grow flex items-center justify-center px-4">
         <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-lg -mt-20">
           <h2 className="text-lg font-medium text-center mb-4">
-            Register with
+            Register
           </h2>
-          <div className="flex justify-center gap-4 mb-6">
-            <button className="p-3 rounded-lg border">
-              <FaFacebookF />
-            </button>
-            <button className="p-3 rounded-lg border">
-              <BsApple />
-            </button>
-            <button className="p-3 rounded-lg border">
-              <FcGoogle />
-            </button>
-          </div>
+
 
           <div className="text-center text-gray-400 mb-4">or</div>
 

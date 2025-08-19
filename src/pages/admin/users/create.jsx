@@ -7,190 +7,154 @@ import Cookies from "js-cookie";
 export const UsersForm = () => {
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({});
-  const [validationError, setValidationError] = useState([]);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    password_confirmation: "",
+    role: "",
+  });
+
+  const [validationError, setValidationError] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    const url = "https://192.168.0.238:8000/api/users";
-
+    const url =
+      "https://intern-manage-2025-production.up.railway.app/api/users";
     const formData = new FormData();
 
-    form.name && formData.append("name", form.name);
-    form.email && formData.append("email", form.email);
-    form.password && formData.append("password", form.password);
-    form.password_confirmation &&
-      formData.append("password_confirmation", form.password_confirmation);
-    form.role && formData.append("role", form.role);
+    Object.keys(form).forEach((key) => {
+      if (form[key]) formData.append(key, form[key]);
+    });
 
     try {
       const res = await axios.post(url, formData, {
         headers: { Authorization: `Bearer ${Cookies.get("token")}` },
       });
-      console.log(res.data);
 
-      if (res.data) {
-        swalMixin("success", `${res.data.message}`);
-        navigate("/users");
-      }
+      swalMixin("success", `${res.data.message}`);
+      navigate("/users");
     } catch (error) {
       console.error(error);
-
-      if (error.status === 422) {
+      if (error.response && error.response.status === 422) {
         setValidationError(error.response.data.errors);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    console.log(form);
-  }, [form]);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h2 className="font-semibold text-lg mb-6">Add New Users</h2>
+      <h2 className="font-semibold text-xl mb-6">Add New User</h2>
 
       <form className="space-y-4" onSubmit={handleSubmit}>
-        {/* Name */}
+        {/* Nama */}
+        <InputField
+          label="Name"
+          type="text"
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          error={validationError.name}
+        />
+
+        {/* Email */}
+        <InputField
+          label="Email"
+          type="email"
+          name="email"
+          value={form.email}
+          onChange={handleChange}
+          error={validationError.email}
+        />
+
+        {/* Password */}
+        <InputField
+          label="Password"
+          type="password"
+          name="password"
+          value={form.password}
+          onChange={handleChange}
+          error={validationError.password}
+        />
+
+        {/* Konfirmasi Password */}
+        <InputField
+          label="Password Confirmation"
+          type="password"
+          name="password_confirmation"
+          value={form.password_confirmation}
+          onChange={handleChange}
+          error={validationError.password_confirmation}
+        />
+
+        {/* Role */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Name
-          </label>
-          <input
-            type="text"
-            name="name"
-            placeholder="Write here . . . ."
-            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onKeyUp={(e) => {
-              setForm((prev) => {
-                return { ...prev, [e.target.name]: e.target.value };
-              });
-            }}
-          />
-          {validationError.name && (
-            <span
-              className="text-red-500 block mb-3
-          "
-            >
-              {validationError.name}
-            </span>
-          )}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Email
-          </label>
-          <input
-            type="email"
-            name="email"
-            placeholder="Write here . . . ."
-            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onKeyUp={(e) => {
-              setForm((prev) => {
-                return { ...prev, [e.target.name]: e.target.value };
-              });
-            }}
-          />
-          {validationError.email && (
-            <span
-              className="text-red-500 block mb-3
-          "
-            >
-              {validationError.email}
-            </span>
-          )}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Password
-          </label>
-          <input
-            type="password"
-            name="password"
-            placeholder="Write here . . . ."
-            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onKeyUp={(e) => {
-              setForm((prev) => {
-                return { ...prev, [e.target.name]: e.target.value };
-              });
-            }}
-          />
-          {validationError.password && (
-            <span
-              className="text-red-500 block mb-3
-          "
-            >
-              {validationError.password}
-            </span>
-          )}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Password Confirmation
-          </label>
-          <input
-            type="password"
-            name="password_confirmation"
-            placeholder="Write here . . . ."
-            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onKeyUp={(e) => {
-              setForm((prev) => {
-                return { ...prev, [e.target.name]: e.target.value };
-              });
-            }}
-          />
-          {validationError.password && (
-            <span
-              className="text-red-500 block mb-3
-          "
-            >
-              {validationError.password}
-            </span>
-          )}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Role
           </label>
           <select
             name="role"
+            value={form.role}
+            onChange={handleChange}
             className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onChange={(e) => {
-              setForm((prev) => {
-                return { ...prev, [e.target.name]: e.target.value };
-              });
-            }}
           >
             <option value="">Select Role</option>
             <option value="admin">Admin</option>
-            <option value="intern">Intern</option>
             <option value="staff">Staff</option>
+            <option value="intern">Intern</option>
           </select>
           {validationError.role && (
-            <span
-              className="text-red-500 block mb-3
-          "
-            >
+            <span className="text-red-500 text-sm block mt-1">
               {validationError.role}
             </span>
           )}
         </div>
-        {/* Buttons */}
+
+        {/* Tombol */}
         <div className="flex gap-4 pt-4">
           <button
             type="submit"
-            className="bg-gradient-to-br from-blue-900 to-gray-800 text-white px-6 py-2 rounded-lg hover:bg-[#1e2240] transition"
+            disabled={loading}
+            className={`${
+              loading ? "opacity-60 cursor-not-allowed" : ""
+            } bg-gradient-to-br from-blue-900 to-gray-800 text-white px-6 py-2 rounded-lg hover:bg-[#1e2240] transition`}
           >
-            ADD NEW
+            {loading ? "Processing..." : "ADD NEW"}
           </button>
           <Link
             to="/users"
             className="bg-gray-400 text-white px-6 py-2 rounded-lg hover:bg-gray-500 transition"
           >
-            CANCLE
+            CANCEL
           </Link>
         </div>
       </form>
     </div>
   );
 };
+
+// Komponen Input Reusable
+const InputField = ({ label, type, name, value, onChange, error }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700">{label}</label>
+    <input
+      type={type}
+      name={name}
+      value={value}
+      onChange={onChange}
+      placeholder="Write here . . . ."
+      className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+    {error && <span className="text-red-500 text-sm block mt-1">{error}</span>}
+  </div>
+);

@@ -18,6 +18,7 @@ import { ProfilePage } from "../pages/profile";
 import { AttendanceStaffPage } from "../pages/staff/attendance";
 import { InternshipPage } from "../pages/staff/magang";
 import { ProgressStaffPage } from "../pages/staff/laporanm";
+import { EditUser } from "../pages/admin/users/edit";
 
 export const RootRoute = () => {
   return (
@@ -47,6 +48,7 @@ export const RootRoute = () => {
         <Route path="/createP" element={<ProgressForm />} />
         <Route path="/users" element={<UsersPage />} />
         <Route path="/createU" element={<UsersForm />} />
+        <Route path="/editU/:id" element={<EditUser />} />
 
         {/* staff routes */}
         <Route path="/attendances" element={<AttendanceStaffPage />} />

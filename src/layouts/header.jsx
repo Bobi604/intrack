@@ -1,14 +1,33 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router";
 import Cookies from "js-cookie";
+import axios from "axios";
 
 export const HeaderA = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [user, setUsers] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
-  const username = Cookies.get("name") || "Guest";
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(
+          "https://intern-manage-2025-production.up.railway.app/api/users",
+          {
+            headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+          }
+        );
+        setUsers(res.data.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchData();
+  }, []);
+  const username = Cookies.get("role") || "Guest";
 
   // Mapping pathname ke nama halaman
   const pageTitles = {
@@ -59,7 +78,7 @@ export const HeaderA = () => {
             className="flex items-center space-x-2 focus:outline-none"
           >
             <img
-              src="https://i.pravatar.cc/40"
+              src={`http://intern-manage-2025-production.up.railway.app/d-custs/img/avt/${user.photo}`}
               alt="Profile"
               className="w-8 h-8 rounded-full"
             />
