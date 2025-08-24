@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 
-export const ProgressPage = () => {
+export const ProgressStaffPage = () => {
   const [progress, setProgress] = useState([]);
 
   // Ambil data dari API
@@ -31,9 +31,7 @@ export const ProgressPage = () => {
   // Fungsi untuk update status menjadi "done"
   const markAsDone = (id) => {
     setProgress((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, status: "done" } : item
-      )
+      prev.map((item) => (item.id === id ? { ...item, status: "done" } : item))
     );
   };
 
@@ -71,7 +69,7 @@ export const ProgressPage = () => {
                 <Td>DESCRIPTION</Td>
                 <Td>DEADLINE</Td>
                 <Td>STATUS</Td>
-                <Td>ACTION</Td>
+  
               </Tr>
             </Thead>
             <Tbdy>
@@ -88,14 +86,6 @@ export const ProgressPage = () => {
                         className="bg-yellow-400 text-white px-3 py-1 rounded-lg hover:bg-yellow-600"
                       >
                         Mark as Done
-                      </button>
-                    </Td>
-                    <Td className="flex gap-2">
-                      <button className="text-red-500 hover:underline flex items-center gap-1">
-                        <FaTrash /> Delete
-                      </button>
-                      <button className="text-gray-800 hover:underline flex items-center gap-1">
-                        <FaPen /> Edit
                       </button>
                     </Td>
                   </Tr>
@@ -122,7 +112,7 @@ export const ProgressPage = () => {
                 <Td>DESCRIPTION</Td>
                 <Td>DEADLINE</Td>
                 <Td>STATUS</Td>
-                <Td>ACTION</Td>
+
               </Tr>
             </Thead>
             <Tbdy>
@@ -136,14 +126,7 @@ export const ProgressPage = () => {
                     <Td>
                       <span className="text-green-600 font-bold">Done</span>
                     </Td>
-                    <Td className="flex gap-2">
-                      <button className="text-red-500 hover:underline flex items-center gap-1">
-                        <FaTrash /> Delete
-                      </button>
-                      <button className="text-gray-800 hover:underline flex items-center gap-1">
-                        <FaPen /> Edit
-                      </button>
-                    </Td>
+
                   </Tr>
                 ))
               ) : (

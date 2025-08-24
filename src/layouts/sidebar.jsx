@@ -6,31 +6,34 @@ import { FaBars, FaHome, FaUsers } from "react-icons/fa";
 import { IoMdMegaphone } from "react-icons/io";
 import { ImLocation2 } from "react-icons/im";
 import { BsClipboardData } from "react-icons/bs";
+import { GiBroom } from "react-icons/gi";
 import Logo from "../assets/img/logo.png";
 import axios from "axios";
 
 export const Sidebar = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await axios.get(
-          "https://intern-manage-2025-production.up.railway.app/api/users",
-          {
-            headers: { Authorization: `Bearer ${Cookies.get("token")}` },
-          }
-        );
-      } catch (error) {
-        console.error("Error fetching roles:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   // Ambil role dari cookie
-  const userRole = Cookies.get("role"); // "admin", "staff", atau "magang"
+  const userRole = Cookies.get("role"); // admin | staff | intern
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (userRole === "admin") {
+        try {
+          await axios.get(
+            "https://intern-manage-2025-production.up.railway.app/api/users",
+            {
+              headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+            }
+          );
+        } catch (error) {
+          console.error("Error fetching users:", error);
+        }
+      }
+    };
+    fetchData();
+  }, [userRole]);
 
   // Definisi menu berdasarkan role
   const menuByRole = {
@@ -47,8 +50,8 @@ export const Sidebar = () => {
       { to: "/progresss", label: "Daily Work Report", icon: <IoMdMegaphone /> },
     ],
     intern: [
-      { to: "/dashboardmagang", label: "Dashboard", icon: <FaHome /> },
-      { to: "/users", label: "Users", icon: <FaUsers /> },
+      { to: "/dashboardmg", label: "Dashboard", icon: <FaHome /> },
+      { to: "/jadwal", label: "Jadwal Piket", icon: <GiBroom />},
       { to: "/attendance", label: "Attendance", icon: <ImLocation2 /> },
       { to: "/progress", label: "Daily Work Report", icon: <IoMdMegaphone /> },
     ],

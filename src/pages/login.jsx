@@ -5,42 +5,53 @@ import Cookies from "js-cookie";
 import Logo from "../../src/assets/img/logo.png";
 
 export const LoginPage = () => {
-  axios.defaults.withCredentials = true; // Set axios to send cookies with requests'
-  axios.defaults.withXSRFToken = true; // Enable CSRF protection
+  axios.defaults.withCredentials = true;
+  axios.defaults.withXSRFToken = true;
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Reset error
+    setError("");
 
     try {
+      // Ambil CSRF token
       await axios.get(
         "https://intern-manage-2025-production.up.railway.app/sanctum/csrf-cookie"
-      ); // Get CSRF token
+      );
+
+      // Login request
       const res = await axios.post(
         "https://intern-manage-2025-production.up.railway.app/api/login",
         form
       );
 
-      const token = res.data.token.plainTextToken;
-      const role = res.data.token.accessToken.abilities; // Ambil "admin", "staff", "magang"
+      console.log("API Login Response:", res.data);
+
+      const token = res.data?.token?.plainTextToken;
+      const abilities = res.data?.token?.accessToken?.abilities || [];
       const user = res.data?.user;
 
-      // Simpan ke cookies
+      // ambil role, cek apakah dari user atau abilities
+      const role = user?.role || abilities[0] || "";
+
+      // simpan ke cookies
       Cookies.set("token", token, { expires: 7 });
-      Cookies.set("role", role || "");
+      Cookies.set("role", role);
       Cookies.set("username", user?.name || "");
       Cookies.set("userId", user?.id || "");
 
-      // Arahkan berdasarkan role
+      console.log("Role detected:", role);
+
+      // redirect sesuai role
       if (role === "admin") navigate("/dashboardadmin");
       else if (role === "staff") navigate("/dashboardstaff");
-      else if (role === "attendance") navigate("/dashboardmagang");
-      else navigate("/dashboardadmin");
+      else if (role === "magang") navigate("/dashboardmg");
+      else navigate("/dashboardmg");
+
     } catch (err) {
-      console.error(err);
+      console.error("Login error:", err);
       setError("Email atau password salah.");
     }
   };

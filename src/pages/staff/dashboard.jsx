@@ -45,7 +45,7 @@ export const DashboardStaffPage = () => {
                 10 Intern
               </h2>
               <Link
-                to="/users"
+                to="/magangs"
                 className="text-black display: flex align-items: center"
               >
                 Check It
@@ -59,7 +59,7 @@ export const DashboardStaffPage = () => {
             <div>
               <p className="text-gray-500">Attendance Today</p>
               <h2 className="text-2xl font-semibold">10 Present</h2>
-              <Link to="/attendance" className="text-black">
+              <Link to="/attendances" className="text-black">
                 Check It
                 <FaArrowRightLong />
               </Link>
@@ -71,7 +71,7 @@ export const DashboardStaffPage = () => {
             <div>
               <p className="text-gray-500">Total Progress</p>
               <h2 className="text-2xl font-semibold">10 Progress</h2>
-              <Link to="/progress" className="text-black">
+              <Link to="/progresss" className="text-black">
                 Check It
                 <FaArrowRightLong />
               </Link>

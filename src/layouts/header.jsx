@@ -37,6 +37,7 @@ export const HeaderA = () => {
     "/users": "Users",
     "/magang": "Magang",
     "/attendance": "Attendance",
+    "/jadwal":" Jadwal Piket",
     "/progress": "Daily Work Report",
     "/profile": "Profile",
     "/about": "About Us",

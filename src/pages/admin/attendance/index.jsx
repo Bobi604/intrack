@@ -3,10 +3,11 @@ import { HeaderA } from "../../../layouts/header";
 import { Footer } from "../../../components/footer";
 import { Table, Tbdy, Td, Thead, Tr } from "../../../components/table";
 import { Link } from "react-router";
-import { FaPen, FaTrash } from "react-icons/fa";
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { swalDialog, swalMixin } from "../../../library/sweetalert";
 
 export const AttendancePage = () => {
   const [attendances, setAttendance] = useState([]);
@@ -25,6 +26,28 @@ export const AttendancePage = () => {
     };
     fetchData();
   }, []);
+  const handleDeleteAttendance = async (id) => {
+    const confirm = await swalDialog(
+      "Are you sure you want to delete this user?",
+      "warning"
+    );
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      const response = await axios.delete(
+        `https://intern-manage-2025-production.up.railway.app/api/intern_attends/${id}`,
+        {
+          headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+        }
+      );
+
+      swalMixin("success", response.data.message); // pakai Toast untuk feedback
+    } catch (error) {
+      console.error(error);
+      swalMixin("error", "Failed to delete user.");
+    }
+  };
   return (
     <div className="bg-gray-200 text-gray-900">
       <HeaderA />
@@ -61,10 +84,16 @@ export const AttendancePage = () => {
                   <Td>{attendance.jam_keluar}</Td>
                   <Td>{attendance.status}</Td>
                   <Td>
-                    <button className="text-blue-500 hover:underline">
+                    <Link
+                      to={`/edita/${attendance.id}`}
+                      className="text-blue-500 hover:underline"
+                    >
                       Edit
-                    </button>
-                    <button className="text-red-500 hover:underline ml-2">
+                    </Link>
+                    <button
+                      onClick={() => handleDeleteAttendance(attendance.id)}
+                      className="text-red-500 hover:underline ml-2"
+                    >
                       Delete
                     </button>
                   </Td>

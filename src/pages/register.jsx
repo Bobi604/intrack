@@ -1,11 +1,61 @@
-import { FaFacebookF } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
-import { BsApple } from "react-icons/bs";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import Logo from "../../src/assets/img/logo.png";
+import { useState } from "react";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { swalMixin } from "../library/sweetalert";
 
 export const RegisterPage = () => {
-  
+  const navigate = useNavigate();
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    password_confirmation: "",
+  });
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrors({});
+    setLoading(true);
+
+    if (form.password !== form.password_confirmation) {
+      setErrors({
+        password_confirmation: ["Password confirmation does not match."],
+      });
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await axios.post(
+        "https://intern-manage-2025-production.up.railway.app/api/register",
+        form
+      );
+
+      const { token, user } = res.data;
+      Cookies.set("token", token, { expires: 1 });
+      Cookies.set("user", JSON.stringify(user), { expires: 1 });
+
+      swalMixin("success", "Register successful!");
+      navigate("/login");
+    } catch (err) {
+      if (err.response?.status === 422) {
+        setErrors(err.response.data.errors || {});
+      } else {
+        swalMixin("error", "Register failed.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
@@ -31,46 +81,77 @@ export const RegisterPage = () => {
       {/* Form Card */}
       <div className="flex-grow flex items-center justify-center px-4">
         <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-lg -mt-20">
-          <h2 className="text-lg font-medium text-center mb-4">
-            Register
-          </h2>
-
+          <h2 className="text-lg font-medium text-center mb-4">Register</h2>
 
           <div className="text-center text-gray-400 mb-4">or</div>
 
-          <form className="space-y-4">
-            <input
-              type="text"
-              placeholder="Your full name"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring"
-            />
-            <input
-              type="email"
-              placeholder="Your email address"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring"
-            />
-            <input
-              type="password"
-              placeholder="Your password"
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring"
-            />
-
-            <div className="flex items-center text-sm gap-2">
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div>
               <input
-                type="checkbox"
-                id="remember"
-                className="accent-teal-500"
+                type="text"
+                name="name"
+                placeholder="Your full name"
+                value={form.name}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring"
               />
-              <label htmlFor="remember" className="text-gray-600">
-                Remember me
-              </label>
+              {errors.name && (
+                <p className="text-sm text-red-500 mt-1">{errors.name[0]}</p>
+              )}
+            </div>
+
+            <div>
+              <input
+                type="email"
+                name="email"
+                placeholder="Your email address"
+                value={form.email}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring"
+              />
+              {errors.email && (
+                <p className="text-sm text-red-500 mt-1">{errors.email[0]}</p>
+              )}
+            </div>
+
+            <div>
+              <input
+                type="password"
+                name="password"
+                placeholder="Your password"
+                value={form.password}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring"
+              />
+              {errors.password && (
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.password[0]}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <input
+                type="password"
+                name="password_confirmation"
+                placeholder="Confirm your password"
+                value={form.password_confirmation}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring"
+              />
+              {errors.password_confirmation && (
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.password_confirmation[0]}
+                </p>
+              )}
             </div>
 
             <button
               type="submit"
-              className="w-full bg-teal-400 text-white py-2 rounded-lg font-semibold hover:bg-teal-500"
+              disabled={loading}
+              className="w-full bg-teal-400 text-white py-2 rounded-lg font-semibold hover:bg-teal-500 transition disabled:opacity-60"
             >
-              SIGN UP
+              {loading ? "Processing..." : "SIGN UP"}
             </button>
 
             <p className="text-sm text-center text-gray-600 mt-4">

@@ -1,51 +1,129 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import Cookies from "js-cookie";
 
 export const ProgressForm = () => {
+  const [users, setUsers] = useState([]);
+  const [form, setForm] = useState({
+    user_id: "",
+    task: "",
+    description: "",
+    deadline: "",
+  });
+  const navigate = useNavigate();
+
+  // Ambil daftar user untuk dropdown
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await axios.get(
+          "https://intern-manage-2025-production.up.railway.app/api/users",
+          {
+            headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+          }
+        );
+        setUsers(res.data.data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+    fetchUsers();
+  }, []);
+
+  // Handle input perubahan
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // Submit ke API
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(
+        "https://intern-manage-2025-production.up.railway.app/api/job_interns",
+        form,
+        {
+          headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+        }
+      );
+      navigate("/progress"); // redirect ke list
+    } catch (error) {
+      console.error("Create progress error:", error.response?.data || error);
+      alert("Failed to create progress, check console!");
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h2 className="font-semibold text-lg mb-6">Add New Attendance</h2>
+      <h2 className="font-semibold text-lg mb-6">Add New Progress Report</h2>
 
-      <form className="space-y-4">
-        {/* Name */}
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        {/* User Select */}
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Name
+            Intern's Name
+          </label>
+          <select
+            name="user_id"
+            value={form.user_id}
+            onChange={handleChange}
+            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          >
+            <option value="">-- Select User --</option>
+            {users.map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Task */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Task
           </label>
           <input
             type="text"
-            placeholder="Write here . . . ."
+            name="task"
+            value={form.task}
+            onChange={handleChange}
+            placeholder="Enter task . . ."
             className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
           />
         </div>
 
-        {/* Date */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Date
-          </label>
-          <input
-            type="date"
-            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        {/* Keterangan */}
+        {/* Description */}
         <div>
           <label className="block text-sm font-medium text-gray-700">
             Descriptions
           </label>
           <textarea
-            placeholder="Write here . . . ."
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            placeholder="Write here . . ."
             className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows="3"
+            required
           />
         </div>
+
+        {/* Deadline */}
         <div>
           <label className="block text-sm font-medium text-gray-700">
             Deadline
           </label>
           <input
-            type="time"
+            type="date"
+            name="deadline"
+            value={form.deadline}
+            onChange={handleChange}
             className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
           />
         </div>
 
@@ -61,7 +139,7 @@ export const ProgressForm = () => {
             to="/progress"
             className="bg-gray-400 text-white px-6 py-2 rounded-lg hover:bg-gray-500 transition"
           >
-            CANCLE
+            CANCEL
           </Link>
         </div>
       </form>

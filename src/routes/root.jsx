@@ -3,7 +3,6 @@ import { DashboardAdminPage } from "../pages/admin/dashboard";
 import { DashboardStaffPage } from "../pages/staff/dashboard";
 import { DashboardMgPage } from "../pages/magang/dashboard";
 import { JadwalPage } from "../pages/magang/jadwal";
-import { AdminIPage } from "../layouts/admin/index";
 import { LoginPage } from "../pages/login";
 import { RegisterPage } from "../pages/register";
 import { UsersPage } from "../pages/admin/users/index";
@@ -17,7 +16,7 @@ import { Home } from "../pages/home";
 import { ProfilePage } from "../pages/profile";
 import { AttendanceStaffPage } from "../pages/staff/attendance";
 import { InternshipPage } from "../pages/staff/magang";
-import { ProgressStaffPage } from "../pages/staff/laporanm";
+import { ProgressStaffPage } from "../pages/staff/progress/laporanm";
 import { EditUser } from "../pages/admin/users/edit";
 
 export const RootRoute = () => {
@@ -32,7 +31,7 @@ export const RootRoute = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         {/* dashboard routes */}
-        <Route path="/adminI" element={<AdminIPage />} />
+
 
         {/* Admin, Staff, and Mg dashboard routes */}
         <Route path="/dashboardadmin" element={<DashboardAdminPage />} />
@@ -42,13 +41,14 @@ export const RootRoute = () => {
         {/* Magang routes */}
         <Route path="/attendance" element={<AttendancePage />} />
         <Route path="/ceratea" element={<AttendanceForm />} />
-        <Route path="/edita" element={<EditAttendance />} />
+        <Route path="/edita/:id" element={<EditAttendance />} />
         <Route path="/jadwal" element={<JadwalPage />} />
         <Route path="/progress" element={<ProgressPage />} />
         <Route path="/createP" element={<ProgressForm />} />
         <Route path="/users" element={<UsersPage />} />
         <Route path="/createU" element={<UsersForm />} />
         <Route path="/editU/:id" element={<EditUser />} />
+        
 
         {/* staff routes */}
         <Route path="/attendances" element={<AttendanceStaffPage />} />
