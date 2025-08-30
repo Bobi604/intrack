@@ -16,7 +16,7 @@ export const ProgressStaffPage = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          "https://intern-manage-2025-production.up.railway.app/api/job_interns",
+          "https://intern-manage-2025-production.up.railway.app/api/job_intern",
           { headers: { Authorization: `Bearer ${Cookies.get("token")}` } }
         );
         console.log("API Raw Response:", res.data);

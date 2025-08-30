@@ -4,9 +4,11 @@ import { Footer } from "../components/footer";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { Link } from "react-router";
+import Logo from "../../src/assets/img/logo.png";
 
 export const ProfilePage = () => {
-  const [user, setUser] = useState({});
+  const [users, setUsers] = useState({});
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -17,7 +19,8 @@ export const ProfilePage = () => {
             headers: { Authorization: `Bearer ${Cookies.get("token")}` },
           }
         );
-        setUser(res.data);
+        console.log("User data:", res.data); // 👉 cek isi user.photo
+        setUsers(res.data);
       } catch (error) {
         console.error("Failed to fetch profile:", error);
       }
@@ -39,46 +42,47 @@ export const ProfilePage = () => {
             <div className="relative w-40 h-40">
               <img
                 src={
-                  user.photo
-                    ? `http://intern-manage-2025-production.up.railway.app/d-custs/img/avt/${user.photo}`
+                  users.photo
+                    ? `http://intern-manage-2025-production.up.railway.app/d-custs/img/avt/${users.photo}`
                     : "/default-avatar.png"
                 }
-                alt={user.name}
+                alt={users.name}
                 className="w-full h-full object-cover rounded-full border shadow"
               />
-              <button
+              <Link
+                to="/editprofile"
                 className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow hover:bg-gray-200"
                 title="Edit Photo"
               >
                 ✏️
-              </button>
+              </Link>
             </div>
 
             {/* INFO USER */}
             <div className="flex-1 space-y-2">
               <div>
-                <span className="font-semibold">Name</span> : {user.name}
+                <span className="font-semibold">Name</span> : {users.name}
               </div>
               <div>
-                <span className="font-semibold">Email</span> : {user.email}
+                <span className="font-semibold">Email</span> : {users.email}
               </div>
               <div>
                 <span className="font-semibold">Tanggal Bergabung</span> :{" "}
-                {new Date(user.created_at).toLocaleDateString("id-ID", {
+                {new Date(users.created_at).toLocaleDateString("id-ID", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
                 })}
               </div>
               <div>
-                <span className="font-semibold">Role</span> : {user.role}
+                <span className="font-semibold">Role</span> : {users.role}
               </div>
             </div>
 
             {/* BADGE / LOGO */}
             <div className="hidden md:block">
               <img
-                src="/in-track-badge.png"
+                src={Logo}
                 alt="In Track"
                 className="w-40 rounded-lg shadow"
               />

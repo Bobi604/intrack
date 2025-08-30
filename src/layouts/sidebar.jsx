@@ -52,8 +52,8 @@ export const Sidebar = () => {
     intern: [
       { to: "/dashboardmg", label: "Dashboard", icon: <FaHome /> },
       { to: "/jadwal", label: "Jadwal Piket", icon: <GiBroom />},
-      { to: "/attendance", label: "Attendance", icon: <ImLocation2 /> },
-      { to: "/progress", label: "Daily Work Report", icon: <IoMdMegaphone /> },
+      { to: "/attendancemg", label: "Attendance", icon: <ImLocation2 /> },
+      { to: "/progressmg", label: "Daily Work Report", icon: <IoMdMegaphone /> },
     ],
   };
 
@@ -67,7 +67,7 @@ export const Sidebar = () => {
     <>
       {/* Toggle Button (Mobile) */}
       <button
-        className="md:hidden p-4 text-gray-700 z-50 relative"
+        className="md:hidden p-4 text-gray-700 z-50 absolute fixed"
         onClick={() => setIsOpen(!isOpen)}
       >
         <FaBars size={24} />

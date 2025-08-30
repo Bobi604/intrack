@@ -1,150 +1,162 @@
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
+// src/pages/attendance/absensi.jsx
+import { Sidebar } from "../../layouts/sidebar";
+import { HeaderA } from "../../layouts/header";
+import { Footer } from "../../components/footer";
+import { Table, Tbdy, Td, Thead, Tr } from "../../components/table";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Cookies from "js-cookie";
+import { swalMixin } from "../../library/sweetalert";
 
-const InternAttendance = () => {
-  // const [attendances, setAttendances] = useState([]);
-  // const [loading, setLoading] = useState(false);
-  // const [message, setMessage] = useState("");
+export const AttendanceIntern = () => {
+  const [attendances, setAttendances] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // const token = Cookies.get("token"); // token dari login
-  // const userId = Cookies.get("userId"); // id user login
-  // const role = Cookies.get("role"); // role = "internship"
+  const userId = Cookies.get("userId");
+  const username = Cookies.get("username");
+  const token = Cookies.get("token");
 
-  // // Fetch data absensi
-  // const fetchData = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const res = await axios.get(
-  //       "https://intern-manage-2025-production.up.railway.app/attend_intern",
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           Accept: "application/json",
-  //         },
-  //       }
-  //     );
-  //     setAttendances(res.data);
-  //   } catch (err) {
-  //     console.error("Fetch error:", err);
-  //     setMessage("Gagal mengambil data absensi");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  // Ambil data absensi hanya untuk user login
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(
+          "https://intern-manage-2025-production.up.railway.app/api/tmp_ia",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
 
-  // // Kirim aksi absensi
-  // const handleAction = async (action) => {
-  //   try {
-  //     setLoading(true);
-  //     const res = await axios.post(
-  //       "https://intern-manage-2025-production.up.railway.app/attend_intern",
-  //       {
-  //         user_id: userId,
-  //         action: action, // "checkin", "checkout", "ijin", "sakit"
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           Accept: "application/json",
-  //         },
-  //       }
-  //     );
-  //     setMessage(`✅ ${action} berhasil`);
-  //     fetchData(); // refresh data
-  //   } catch (err) {
-  //     console.error("Action error:", err);
-  //     setMessage("❌ Gagal melakukan absensi");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+        const userAttendance = (res.data.data || []).filter(
+          (att) => att.user_id === userId
+        );
 
-  // useEffect(() => {
-  //   if (role === "internship") {
-  //     fetchData();
-  //   } else {
-  //     setMessage("⚠️ Anda tidak memiliki akses ke halaman ini");
-  //   }
-  // }, []);
+        setAttendances(userAttendance);
+      } catch (error) {
+        console.error("Gagal mengambil data absensi:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [token, userId]);
 
-  // return (
-  //   <div className="p-6">
-  //     <h1 className="text-2xl font-bold mb-4">Absensi Magang</h1>
+  // Data absensi hari ini
+  const today = new Date().toISOString().split("T")[0];
+  const todayAttendance = attendances.find((att) => att.tanggal === today);
 
-  //     {message && (
-  //       <div className="mb-4 p-3 bg-blue-100 text-blue-700 rounded">
-  //         {message}
-  //       </div>
-  //     )}
+  // ✅ Kondisi tombol
+  const showCheckIn = !todayAttendance;
+  const showCheckOut =
+    todayAttendance && todayAttendance.jam_masuk && !todayAttendance.jam_keluar;
 
-  //     {/* Tombol aksi */}
-  //     <div className="flex gap-3 mb-6">
-  //       <button
-  //         onClick={() => handleAction("checkin")}
-  //         className="px-4 py-2 bg-green-600 text-white rounded-lg"
-  //       >
-  //         Check-in
-  //       </button>
-  //       <button
-  //         onClick={() => handleAction("checkout")}
-  //         className="px-4 py-2 bg-red-600 text-white rounded-lg"
-  //       >
-  //         Check-out
-  //       </button>
-  //       <button
-  //         onClick={() => handleAction("ijin")}
-  //         className="px-4 py-2 bg-yellow-500 text-white rounded-lg"
-  //       >
-  //         Ijin
-  //       </button>
-  //       <button
-  //         onClick={() => handleAction("sakit")}
-  //         className="px-4 py-2 bg-gray-600 text-white rounded-lg"
-  //       >
-  //         Sakit
-  //       </button>
-  //     </div>
+  // ✅ Fungsi Check In
+  const handleCheckIn = async () => {
+    try {
+      const payload = { user_id: userId, status: "Hadir" };
 
-  //     {/* Tabel absensi */}
-  //     <div className="overflow-x-auto bg-white shadow rounded-lg">
-  //       <table className="w-full border">
-  //         <thead className="bg-gray-100">
-  //           <tr>
-  //             <th className="border px-4 py-2">Tanggal</th>
-  //             <th className="border px-4 py-2">Jam Masuk</th>
-  //             <th className="border px-4 py-2">Jam Keluar</th>
-  //             <th className="border px-4 py-2">Status</th>
-  //           </tr>
-  //         </thead>
-  //         <tbody>
-  //           {loading ? (
-  //             <tr>
-  //               <td colSpan="4" className="text-center py-4">
-  //                 Loading...
-  //               </td>
-  //             </tr>
-  //           ) : attendances.length > 0 ? (
-  //             attendances.map((a, i) => (
-  //               <tr key={i}>
-  //                 <td className="border px-4 py-2">{a.tanggal}</td>
-  //                 <td className="border px-4 py-2">{a.jam_masuk || "-"}</td>
-  //                 <td className="border px-4 py-2">{a.jam_keluar || "-"}</td>
-  //                 <td className="border px-4 py-2">{a.status}</td>
-  //               </tr>
-  //             ))
-  //           ) : (
-  //             <tr>
-  //               <td colSpan="4" className="text-center py-4">
-  //                 Belum ada data absensi
-  //               </td>
-  //             </tr>
-  //           )}
-  //         </tbody>
-  //       </table>
-  //     </div>
-  //   </div>
-  // );
+      const res = await axios.post(
+        "https://intern-manage-2025-production.up.railway.app/api/attend_intern",
+        payload,
+        { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
+      );
+
+      swalMixin("success", res.data.message || "Check-in berhasil!");
+      setAttendances((prev) => [res.data.data, ...prev]);
+    } catch (error) {
+      swalMixin("error", error.response?.data?.message || "Gagal check-in.");
+    }
+  };
+
+  // ✅ Fungsi Check Out
+  const handleCheckOut = async () => {
+    try {
+      const now = new Date();
+      const jam_keluar = now.toTimeString().split(" ")[0];
+
+      const payload = { user_id: userId, tanggal: today, jam_keluar };
+
+      const res = await axios.post(
+        "https://intern-manage-2025-production.up.railway.app/api/attend_intern_checkout",
+        payload,
+        { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
+      );
+
+      swalMixin("success", res.data.message || "Check-out berhasil!");
+      setAttendances((prev) =>
+        prev.map((att) =>
+          att.tanggal === today && att.user_id === userId
+            ? { ...att, jam_keluar }
+            : att
+        )
+      );
+    } catch (error) {
+      swalMixin("error", error.response?.data?.message || "Gagal check-out.");
+    }
+  };
+
+  return (
+    <div className="bg-gray-200 text-gray-900">
+      <HeaderA />
+      <Sidebar />
+
+      <main className="md:ml-64 p-3 pt-20 transition-all min-h-screen bg-gray-200 rounded-lg">
+        <div className="bg-white p-6 shadow rounded-xl overflow-auto">
+          <h3 className="text-xl font-semibold mb-1">Attendance</h3>
+          <p className="mb-4">
+            Hai <span className="font-bold">{username || "User"}</span>, lakukan
+            absensi harian dan lihat riwayat absensi kamu
+          </p>
+
+          {/* Tombol aksi */}
+          <div className="flex justify-end mb-6 gap-3">
+            {showCheckIn && (
+              <button
+                onClick={handleCheckIn}
+                className="bg-gradient-to-r from-blue-600 to-blue-800 text-white px-4 py-2 rounded-xl hover:opacity-90 shadow"
+              >
+                CHECK IN
+              </button>
+            )}
+            {showCheckOut && (
+              <button
+                onClick={handleCheckOut}
+                className="bg-gradient-to-r from-red-600 to-red-800 text-white px-4 py-2 rounded-xl hover:opacity-90 shadow"
+              >
+                CHECK OUT
+              </button>
+            )}
+          </div>
+
+          {/* Tabel absensi */}
+          {loading ? (
+            <p>Loading data absensi...</p>
+          ) : attendances.length === 0 ? (
+            <p className="text-gray-500">Belum ada data absensi.</p>
+          ) : (
+            <Table>
+              <Thead>
+                <Tr>
+                  <Td>DATE</Td>
+                  <Td>CHECK IN</Td>
+                  <Td>CHECK OUT</Td>
+                  <Td>STATUS</Td>
+                </Tr>
+              </Thead>
+              <Tbdy>
+                {attendances.map((att) => (
+                  <Tr key={att.id}>
+                    <Td>{att.tanggal}</Td>
+                    <Td>{att.jam_masuk || "-"}</Td>
+                    <Td>{att.jam_keluar || "-"}</Td>
+                    <Td>{att.status}</Td>
+                  </Tr>
+                ))}
+              </Tbdy>
+            </Table>
+          )}
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
 };
-
-export default InternAttendance;

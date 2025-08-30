@@ -10,6 +10,7 @@ import { FaArrowRightLong } from "react-icons/fa6";
 import { IoDocumentText } from "react-icons/io5";
 import { Link } from "react-router";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export const DashboardMgPage = () => {
   useEffect(() => {
@@ -20,9 +21,12 @@ export const DashboardMgPage = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          "https://intern-manage-2025-production.up.railway.app/api/intern_attends"
+          "https://intern-manage-2025-production.up.railway.app/api/tmp_ia",
+          {
+            headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+          }
         );
-        console.log("Data fetched successfully:", res.data);
+        
         setAttendance(res.data.data);
       } catch (error) {
         console.error("Error in Sidebar component:", error);
@@ -40,12 +44,12 @@ export const DashboardMgPage = () => {
         <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
           <div className="p-4 shadow rounded-xl flex justify-between items-center bg-white">
             <div>
-              <p className="text-gray-500">Total Users</p>
+              <p className="text-gray-500">Jadwal Piket</p>
               <h2 className="text-2xl font-semibold text-decoration-line: underline">
                 10 Intern
               </h2>
               <Link
-                to="/users"
+                to="/jadwal"
                 className="text-black display: flex align-items: center"
               >
                 Check It
@@ -59,7 +63,7 @@ export const DashboardMgPage = () => {
             <div>
               <p className="text-gray-500">Attendance Today</p>
               <h2 className="text-2xl font-semibold">10 Present</h2>
-              <Link to="/attendance" className="text-black">
+              <Link to="/attendancemg" className="text-black">
                 Check It
                 <FaArrowRightLong />
               </Link>
@@ -69,9 +73,9 @@ export const DashboardMgPage = () => {
 
           <div className="p-4 shadow rounded-xl flex justify-between items-center bg-white">
             <div>
-              <p className="text-gray-500">Total Progress</p>
+              <p className="text-gray-500">Total Work</p>
               <h2 className="text-2xl font-semibold">10 Progress</h2>
-              <Link to="/progress" className="text-black">
+              <Link to="/progressmg" className="text-black">
                 Check It
                 <FaArrowRightLong />
               </Link>
@@ -111,23 +115,20 @@ export const DashboardMgPage = () => {
           <Table className="min-w-full">
             <Thead>
               <Tr>
-                <Td>INTEREN'S NAME</Td>
+                
                 <Td>DATE</Td>
                 <Td>CHECK IN TIME</Td>
+                <Td>CHECK OUT TIME</Td>
                 <Td>STATUS</Td>
               </Tr>
             </Thead>
             <Tbdy>
-              {attendances.map((attendance) => (
-                <Tr key={attendance.id}>
-                  <Td>{attendance.user.name}</Td>
-                  <Td>{attendance.tanggal}</Td>
-                  <Td>{attendance.jam_masuk}</Td>
-                  <Td>
-                    <span className="px-2 py-1 rounded bg-green-100 text-green-600 text-xs">
-                      {attendance.status}
-                    </span>
-                  </Td>
+              {attendances.map((att) => (
+                <Tr key={att.id}>
+                  <Td>{att.tanggal}</Td>
+                  <Td>{att.jam_masuk}</Td>
+                  <Td>{att.jam_keluar}</Td>
+                  <Td>{att.status}</Td>
                 </Tr>
               ))}
             </Tbdy>

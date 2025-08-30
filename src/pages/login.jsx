@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router";
+import { Link,useNavigate } from "react-router";
 import axios from "axios";
 import Cookies from "js-cookie";
 import Logo from "../../src/assets/img/logo.png";
@@ -27,8 +27,6 @@ export const LoginPage = () => {
         form
       );
 
-      console.log("API Login Response:", res.data);
-
       const token = res.data?.token?.plainTextToken;
       const abilities = res.data?.token?.accessToken?.abilities || [];
       const user = res.data?.user;
@@ -49,7 +47,6 @@ export const LoginPage = () => {
       else if (role === "staff") navigate("/dashboardstaff");
       else if (role === "magang") navigate("/dashboardmg");
       else navigate("/dashboardmg");
-
     } catch (err) {
       console.error("Login error:", err);
       setError("Email atau password salah.");
@@ -108,9 +105,12 @@ export const LoginPage = () => {
 
           <p className="text-sm text-gray-500 text-center mt-4">
             Don't have an account?{" "}
-            <span className="text-teal-400 font-semibold cursor-pointer">
+            <Link
+              to="/register"
+              className="text-teal-400 font-semibold cursor-pointer"
+            >
               Sign up
-            </span>
+            </Link>
           </p>
         </div>
       </div>

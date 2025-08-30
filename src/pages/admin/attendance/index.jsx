@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { swalDialog, swalMixin } from "../../../library/sweetalert";
+import { FaPen, FaTrash } from "react-icons/fa";
 
 export const AttendancePage = () => {
   const [attendances, setAttendance] = useState([]);
@@ -86,15 +87,15 @@ export const AttendancePage = () => {
                   <Td>
                     <Link
                       to={`/edita/${attendance.id}`}
-                      className="text-blue-500 hover:underline"
+                      className="text-gray-500 hover:underline flex items-center gap-1"
                     >
-                      Edit
+                      <FaPen/>Edit
                     </Link>
                     <button
                       onClick={() => handleDeleteAttendance(attendance.id)}
-                      className="text-red-500 hover:underline ml-2"
+                      className="text-red-500 hover:underline flex items-center gap-1"
                     >
-                      Delete
+                      <FaTrash/>Delete
                     </button>
                   </Td>
                 </Tr>

@@ -10,6 +10,7 @@ import { FaArrowRightLong } from "react-icons/fa6";
 import { IoDocumentText } from "react-icons/io5";
 import { Link } from "react-router";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export const DashboardStaffPage = () => {
   useEffect(() => {
@@ -20,7 +21,8 @@ export const DashboardStaffPage = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          "https://intern-manage-2025-production.up.railway.app/api/intern_attend"
+          "https://intern-manage-2025-production.up.railway.app/api/intern_attend",
+          { headers: { Authorization: `Bearer ${Cookies.get("token")}` } }
         );
         console.log("Data fetched successfully:", res.data);
         setAttendance(res.data.data);
@@ -30,7 +32,6 @@ export const DashboardStaffPage = () => {
     };
     fetchData();
   }, []);
-
   return (
     <div className="bg-gray-200 text-gray-900">
       <HeaderA />

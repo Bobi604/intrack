@@ -12,6 +12,7 @@ export const RegisterPage = () => {
     email: "",
     password: "",
     password_confirmation: "",
+    role: "",
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -94,6 +95,7 @@ export const RegisterPage = () => {
                 value={form.name}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring"
+                required
               />
               {errors.name && (
                 <p className="text-sm text-red-500 mt-1">{errors.name[0]}</p>
@@ -108,6 +110,8 @@ export const RegisterPage = () => {
                 value={form.email}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring"
+                required
+
               />
               {errors.email && (
                 <p className="text-sm text-red-500 mt-1">{errors.email[0]}</p>
@@ -122,6 +126,7 @@ export const RegisterPage = () => {
                 value={form.password}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring"
+                required
               />
               {errors.password && (
                 <p className="text-sm text-red-500 mt-1">
@@ -138,11 +143,32 @@ export const RegisterPage = () => {
                 value={form.password_confirmation}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring"
+                required
               />
               {errors.password_confirmation && (
                 <p className="text-sm text-red-500 mt-1">
                   {errors.password_confirmation[0]}
                 </p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Role
+              </label>
+              <select
+                name="role"
+                value={form.role}
+                onChange={handleChange}
+                className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Role</option>
+                <option value="intern">Intern</option>
+                
+              </select>
+              {errors.role && (
+                <span className="text-red-500 text-sm block mt-1">
+                  {errors.role}
+                </span>
               )}
             </div>
 

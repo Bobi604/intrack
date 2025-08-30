@@ -2,11 +2,12 @@ import { Sidebar } from "../../../layouts/sidebar";
 import { HeaderA } from "../../../layouts/header";
 import { Footer } from "../../../components/footer";
 import { Table, Tbdy, Td, Thead, Tr } from "../../../components/table";
-import { Link } from "react-router";
+import { Link, Links } from "react-router";
 import { FaPen, FaTrash } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { swalDialog, swalMixin } from "../../../library/sweetalert";
 
 export const ProgressPage = () => {
   const [progress, setProgress] = useState([]);
@@ -28,18 +29,53 @@ export const ProgressPage = () => {
     fetchData();
   }, []);
 
-  // Fungsi untuk update status menjadi "done"
-  const markAsDone = (id) => {
-    setProgress((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, status: "done" } : item
-      )
-    );
+  // ================= UPDATE STATUS =================
+  const updateStatus = async (id, newStatus) => {
+    try {
+      // Update ke backend
+      await axios.patch(
+        `https://intern-manage-2025-production.up.railway.app/api/job_interns/${id}`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${Cookies.get("token")}` } }
+      );
+
+      // Update state biar UI sinkron
+      setProgress((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, status: newStatus } : item
+        )
+      );
+    } catch (error) {
+      console.error(" Gagal update status:", error.response.data || error);
+    }
   };
 
   // Pisahkan pending & done
   const pendingTasks = progress.filter((p) => p.status !== "done");
   const doneTasks = progress.filter((p) => p.status === "done");
+
+  const handleDeleteAttendance = async (id) => {
+    const confirm = await swalDialog(
+      "Are you sure you want to delete this user?",
+      "warning"
+    );
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      const response = await axios.delete(
+        `https://intern-manage-2025-production.up.railway.app/api/job_interns/${id}`,
+        {
+          headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+        }
+      );
+
+      swalMixin("success", response.data.message); // pakai Toast untuk feedback
+    } catch (error) {
+      console.error(error);
+      swalMixin("error", "Failed to delete user.");
+    }
+  };
 
   return (
     <div className="bg-gray-200 text-gray-900">
@@ -82,21 +118,27 @@ export const ProgressPage = () => {
                     <Td className="xl:text-wrap">{progres.task}</Td>
                     <Td className="xl:text-wrap">{progres.description}</Td>
                     <Td>{progres.deadline}</Td>
-                    <Td>
-                      <button
-                        onClick={() => markAsDone(progres.id)}
+                    <Td>{progres.status}</Td>
+                    {/* <Td> */}
+                      {/* <button
+                        onClick={() => updateStatus(progres.id, "done")}
                         className="bg-yellow-400 text-white px-3 py-1 rounded-lg hover:bg-yellow-600"
                       >
                         Mark as Done
-                      </button>
-                    </Td>
+                      </button> */}
+                    {/* </Td> */}
                     <Td className="flex gap-2">
-                      <button className="text-red-500 hover:underline flex items-center gap-1">
-                        <FaTrash /> Delete
-                      </button>
-                      <button className="text-gray-800 hover:underline flex items-center gap-1">
+                    <button
+                      onClick={() => handleDeleteAttendance(progres.id)}
+                      className="text-red-500 hover:underline flex items-center gap-1"
+                    >
+                     <FaTrash /> Delete
+                    </button>
+                      <Link 
+                      to={`/editP/${progres.id}`}
+                      className="text-gray-800 hover:underline flex items-center gap-1">
                         <FaPen /> Edit
-                      </button>
+                      </Link>
                     </Td>
                   </Tr>
                 ))
@@ -137,12 +179,24 @@ export const ProgressPage = () => {
                       <span className="text-green-600 font-bold">Done</span>
                     </Td>
                     <Td className="flex gap-2">
-                      <button className="text-red-500 hover:underline flex items-center gap-1">
-                        <FaTrash /> Delete
+                      <button
+                        onClick={() => updateStatus(progres.id, "pending")}
+                        className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+                      >
+                        Mark as Pending
                       </button>
-                      <button className="text-gray-800 hover:underline flex items-center gap-1">
+                    <button
+                      onClick={() => handleDeleteAttendance(progres.id)}
+
+                      className="text-red-500 hover:underline ml-2"
+                    >
+                      Delete
+                    </button>
+                      <Link
+                      to={`/editP/${progres.id}`}
+                      className="text-gray-800 hover:underline flex items-center gap-1">
                         <FaPen /> Edit
-                      </button>
+                      </Link>
                     </Td>
                   </Tr>
                 ))
